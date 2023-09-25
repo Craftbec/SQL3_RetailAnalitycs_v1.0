@@ -165,7 +165,7 @@ SELECT	customer_id, transaction_store_id AS Customer_Primary_Store
 FROM Tmp2
 )
 SELECT Average_Check_Segment.customer_id,
-Average_Check_Segment.Customer_Average_Check AS Customer_Average_Check,
+Average_Check_Segment.Customer_Average_Check,
 Average_Check_Segment.Customer_Average_Check_Segment, 
 Frequency_Segment.Customer_Frequency,
 Frequency_Segment.Customer_Frequency_Segment,
