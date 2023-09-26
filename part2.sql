@@ -20,20 +20,12 @@ SELECT * FROM DateOfAnalysisFormation
 SELECT * FROM Segments
 
   
-DROP VIEW IF EXISTS Customers_View CASCADE;
+-- CLIENTS
+DROP VIEW IF EXISTS Customers CASCADE;
 
-SELECT * FROM Customers_View
-
-
-
+CREATE VIEW Customers AS
 -- Расчет среднего чека
 WITH  
-Transactions_Plus AS (
-SELECT cards.customer_id, cards.customer_card_id, transactions.transaction_id ,transactions.transaction_summ,
-transactions.transaction_datetime, transactions.transaction_store_id
-FROM transactions 
-JOIN cards  ON cards.customer_card_id = transactions.customer_card_id
-),
 Id_Average_Check AS(
 WITH tmp AS (
 SELECT PersonalInformation.customer_id AS customer_id, (SUM(transaction_summ) / COUNT(transaction_summ))::numeric AS customer_average_check
@@ -107,6 +99,12 @@ JOIN Segments ON Average_Check_Segment.customer_average_check_segment=Segments.A
 Churn_Segment.customer_churn_segment=Segments.Churn_probability
 ),
 --Определение основного магазина клиента
+Transactions_Plus AS (
+SELECT cards.customer_id, cards.customer_card_id, transactions.transaction_id ,transactions.transaction_summ,
+transactions.transaction_datetime, transactions.transaction_store_id
+FROM transactions 
+JOIN cards  ON cards.customer_card_id = transactions.customer_card_id
+),
 Primary_Store AS (
 --Общее количество транзакций
 WITH Stores_Trans_Total AS (
@@ -169,7 +167,7 @@ Average_Check_Segment.Customer_Average_Check,
 Average_Check_Segment.Customer_Average_Check_Segment, 
 Frequency_Segment.Customer_Frequency,
 Frequency_Segment.Customer_Frequency_Segment,
-Inactive_Period.Customer_Inactive_Period , 
+Inactive_Period.Customer_Inactive_Period, 
 Churn_Segment.Customer_Churn_Rate, 
 Churn_Segment.Customer_Churn_Segment,
 N_Segment.Customer_Segment,
@@ -184,4 +182,18 @@ ON Average_Check_Segment.customer_id=Churn_Segment.customer_id
 JOIN N_Segment
 ON Average_Check_Segment.customer_id=N_Segment.customer_id
 JOIN Primary_Store
-ON Average_Check_Segment.customer_id=Primary_Store.customer_id
+ON Average_Check_Segment.customer_id=Primary_Store.customer_id;
+
+
+
+SELECT * FROM customers
+WHERE customer_primary_store = 1;
+SELECT * FROM customers
+WHERE customer_churn_segment = 'Low';
+SELECT * FROM customers
+WHERE customer_frequency > 100;
+SELECT * FROM customers
+WHERE customer_inactive_period > 250 AND customer_churn_segment='Low';
+SELECT * FROM customers
+WHERE customer_frequency_segment = 'Occasionally'
+ORDER BY customer_id DESC;

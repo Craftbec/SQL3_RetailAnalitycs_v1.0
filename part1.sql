@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS PersonalInformation, Cards, Transactions, SKUGroup, ProductGrid, Checks, Stores, DateOfAnalysisFormation CASCADE;
 
+
 CREATE TABLE PersonalInformation(
   Customer_ID SERIAL NOT NULL PRIMARY KEY,
   Customer_Name VARCHAR  NOT NULL CHECK (Customer_Name ~ '^([А-Я]{1}[а-я\- ]{0,}|[A-Z]{1}[a-z\- ]{0,})$'),
@@ -97,7 +98,7 @@ SELECT * FROM Checks
 SELECT * FROM Stores
 SELECT * FROM DateOfAnalysisFormation
 
-  
+SET DATESTYLE to iso, DMY;  
 
 CALL import('PersonalInformation', '/Users/craftbec/SQL3_RetailAnalitycs_v1.0/datasets/Personal_Data.tsv'); 
 CALL import('Cards', '/Users/craftbec/SQL3_RetailAnalitycs_v1.0/datasets/Cards.tsv'); 
