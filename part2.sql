@@ -272,3 +272,35 @@ SELECT * FROM Periods
 WHERE Group_ID>10 AND Group_ID<30;
 SELECT * FROM Periods
 ORDER BY 4 DESC;
+
+
+
+
+-- Расчет востребованности
+WITH
+Affinity_Index AS (
+SELECT Purchase_History.customer_id, Periods.group_id, 
+Periods.group_purchase/COUNT(Purchase_History.transaction_id)::NUMERIC AS Group_Affinity_Index
+FROM Purchase_History
+JOIN Periods  ON Periods.customer_id = Purchase_History.customer_id
+WHERE Purchase_History.transaction_datetime BETWEEN first_group_purchase_date AND last_group_purchase_date
+GROUP BY Purchase_History.customer_id, Periods.group_id, Periods.group_purchase),
+-- Расчет индекса оттока из группы
+Churn_Rate AS (
+SELECT Purchase_History.customer_id, Periods.group_id, 
+((EXTRACT(epoch FROM(SELECT * FROM DateOfAnalysisFormation)) - EXTRACT(epoch FROM MAX(transaction_datetime))))/(Periods.group_frequency)/86400::NUMERIC AS Group_Churn_Rate
+FROM Purchase_History
+JOIN Periods ON Purchase_History.customer_id=Periods.customer_id AND Purchase_History.group_id=Periods.group_id
+GROUP BY  Purchase_History.customer_id, Periods.group_id, Periods.group_frequency
+),
+-- Расчет стабильности потребления группы
+Stability_Index AS (
+	SELECT customer_id, transaction_id,  group_id, transaction_datetime,
+	EXTRACT(DAY FROM (transaction_datetime))
+-- 	  EXTRACT(DAY FROM (transaction_datetime - LAG(transaction_datetime)
+-- 	OVER (PARTITION BY customer_id, group_id ORDER BY transaction_datetime))) AS interval
+	FROM Purchase_History
+	  GROUP BY customer_id, transaction_id, group_id, transaction_datetime
+	ORDER BY customer_id,transaction_datetime
+
+)
