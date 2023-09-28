@@ -181,7 +181,7 @@ WHERE customer_churn_segment = 'Low';
 SELECT * FROM customers
 WHERE customer_frequency > 100;
 SELECT * FROM customers
-WHERE customer_inactive_period > 250 AND customer_churn_segment='Low';
+WHERE customer_inactive_period > 100 AND customer_churn_segment='Low';
 SELECT * FROM customers
 WHERE customer_frequency_segment = 'Occasionally'
 ORDER BY customer_id DESC;
@@ -264,6 +264,9 @@ ORDER BY 4 DESC;
 
 
 
+DROP VIEW IF EXISTS Groups CASCADE;
+
+CREATE VIEW Groups AS
 -- Расчет востребованности
 WITH
 Affinity_Index AS (
@@ -328,7 +331,7 @@ Count_Discount_Share AS (
  ),
 -- Определение минимального размера скидки по группе
 Min_Discount AS (
-	SELECT customer_id,  group_id, MIN(group_min_discount) AS Group_Minimum_Discount
+	SELECT customer_id,  group_id, MIN(group_min_discount)::NUMERIC AS Group_Minimum_Discount
 	FROM Periods
 	WHERE group_min_discount>0
 	GROUP BY customer_id,  group_id
@@ -341,9 +344,10 @@ JOIN Checks ON purchase_history.transaction_id = Checks.transaction_id
 WHERE sku_discount > 0
 GROUP BY customer_id, group_id
 )
-
-SELECT Affinity_Index.customer_id, Affinity_Index.group_id, group_affinity_index, Group_Churn_Rate, Group_Stability_Index,Group_Margin, Group_Discount_Share,Group_Minimum_Discount
-Group_Average_Discount
+SELECT Affinity_Index.customer_id, Affinity_Index.group_id, ROUND(group_affinity_index,2) AS group_affinity_index, ROUND(Group_Churn_Rate,2) AS Group_Churn_Rate,
+ROUND(Group_Stability_Index,2) AS Group_Stability_Index,
+ROUND(Group_Margin,2) AS Group_Margin, ROUND(Group_Discount_Share,2) AS Group_Discount_Share, ROUND(Group_Minimum_Discount,2) AS Group_Minimum_Discount,
+ROUND(Group_Average_Discount,2) AS Group_Average_Discount
 FROM Affinity_Index
 JOIN Churn_Rate ON Affinity_Index.group_id = Churn_Rate.group_id AND Affinity_Index.customer_id = Churn_Rate.customer_id
 JOIN Stable_Consumption ON Stable_Consumption.group_id = Affinity_Index.group_id AND Stable_Consumption.customer_id = Affinity_Index.customer_id
