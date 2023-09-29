@@ -1,6 +1,6 @@
-DROP VIEW IF EXISTS Purchase_History CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS Purchase_History CASCADE;
 
-CREATE VIEW  Purchase_History AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS  Purchase_History AS
 SELECT PersonalInformation.customer_id, Transactions.Transaction_ID, Transactions.Transaction_DateTime, ProductGrid.group_id, 
 SUM(Stores.sku_purchase_price*Checks.sku_amount)::NUMERIC AS Group_Cost, SUM(Checks.sku_summ)::NUMERIC AS Group_Summ,
 SUM(Checks.sku_sum_paid)::NUMERIC AS Group_Summ_Paid

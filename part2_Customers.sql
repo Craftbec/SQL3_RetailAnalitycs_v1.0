@@ -8,9 +8,9 @@ CREATE TABLE Segments (
 
 CALL import('Segments', '/Users/craftbec/SQL3_RetailAnalitycs_v1.0/datasets/Segments.tsv'); 
 
-DROP VIEW IF EXISTS Customers CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS Customers CASCADE;
 
-CREATE VIEW Customers AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS Customers AS
 -- Расчет среднего чека
 WITH  
 Id_Average_Check AS(

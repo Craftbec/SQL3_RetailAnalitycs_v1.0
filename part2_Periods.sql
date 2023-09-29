@@ -1,6 +1,6 @@
-DROP VIEW IF EXISTS Periods CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS Periods CASCADE;
 
-CREATE VIEW  Periods AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS  Periods AS
 WITH 
 Period AS (
 SELECT PersonalInformation.customer_id, Transactions.Transaction_ID, ProductGrid.group_id, (Checks.sku_discount/Checks.sku_summ) AS Group_Min_Discount
