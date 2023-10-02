@@ -89,16 +89,10 @@ AS $$
   $$LANGUAGE plpgsql;  
 
 
-SELECT * FROM PersonalInformation
-SELECT * FROM Cards
-SELECT * FROM Transactions
-SELECT * FROM SKUGroup
-SELECT * FROM ProductGrid
-SELECT * FROM Checks
-SELECT * FROM Stores
-SELECT * FROM DateOfAnalysisFormation
 
 SET DATESTYLE to iso, DMY;  
+
+-- Before call change the path to .tsv files 
 
 CALL import('PersonalInformation', '/Users/craftbec/SQL3_RetailAnalitycs_v1.0/datasets/Personal_Data.tsv'); 
 CALL import('Cards', '/Users/craftbec/SQL3_RetailAnalitycs_v1.0/datasets/Cards.tsv'); 
