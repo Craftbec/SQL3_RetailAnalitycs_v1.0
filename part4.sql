@@ -44,6 +44,25 @@ $$ LANGUAGE plpgsql;
 
 
 
-SELECT customer_id, group_id, Group_Affinity_Index , Group_Churn_Rate, Group_Discount_Share, ROW_NUMBER() OVER (PARTITION BY group_id ORDER BY Group_Affinity_Index DESC) AS rank
+WITH
+tmp AS (
+SELECT customer_id, group_id, Group_Affinity_Index, ROW_NUMBER() OVER (PARTITION BY group_id ORDER BY Group_Affinity_Index DESC) AS rank
+FROM groups
+WHERE Group_Churn_Rate <= 1.2 AND Group_Discount_Share <=3)
+SELECT customer_id, group_id, Group_Affinity_Index FROM tmp
+WHERE rank = 1
+
+
+
+CREATE OR REPLACE FUNCTION ttttt(ma NUMERIC, mi NUMERIC, average_factor NUMERIC) RETURNS TABLE (Customer_ID INTEGER, Group_Name VARCHAR, Offer_Discount_Depth VARCHAR)
+AS $$
+BEGIN
+WITH
+tmp AS (
+SELECT  DISTINCT ON (customer_id) customer_id, Group_Margin
 FROM groups
 WHERE Group_Churn_Rate <= 1.2 AND Group_Discount_Share <=3
+)
+SELECT * FROM tmp
+END;
+$$ LANGUAGE plpgsql
