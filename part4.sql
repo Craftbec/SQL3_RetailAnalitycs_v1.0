@@ -17,7 +17,8 @@ CREATE FUNCTION GetDates(key integer)
 
 
 
-CREATE OR REPLACE FUNCTION test(ma date, mi date, average_factor NUMERIC) RETURNS TABLE (Customer_ID INTEGER, Required_Check_Measure NUMERIC)
+CREATE OR REPLACE FUNCTION test(ma date, mi date, average_factor NUMERIC, n1 NUMERIC, n2 NUMERIC, n3 NUMERIC)
+RETURNS TABLE (Customer_ID INTEGER, Required_Check_Measure NUMERIC, Group_Name VARCHAR, Offer_Discount_Depth NUMERIC)
 AS $$
 BEGIN
         IF (ma > GetDates(1)) THEN
@@ -29,22 +30,23 @@ BEGIN
                 'Некорректный период';
         END IF;
 		RETURN QUERY
+		WITH res1 AS (
 SELECT Personalinformation.customer_id AS c_id, (SUM(SKU_Summ)/COUNT(Personalinformation.customer_id)*average_factor)::NUMERIC AS Required
 FROM Personalinformation
 JOIN Cards ON Personalinformation.customer_id = Cards.customer_id
 JOIN Transactions ON Cards.customer_card_id = Transactions.customer_card_id
 JOIN Checks ON Checks.Transaction_id = Transactions.Transaction_id
-WHERE date(transaction_datetime) >= '2015-01-20' AND date(transaction_datetime)<= '2023-08-20'
-GROUP BY Personalinformation.customer_id;
+WHERE date(transaction_datetime) >= mi AND date(transaction_datetime)<= ma
+GROUP BY Personalinformation.customer_id)
+SELECT Customer, Required , G_Name , G_Discount NUMERIC 
+FROM res1
+JOIN nnn(n1, n2,n3) tmp ON res1.c_id = tmp.Customer;
 END;
 $$ LANGUAGE plpgsql;
 
 
 
-
-
-
-CREATE OR REPLACE FUNCTION nnn(n1 NUMERIC, n2 NUMERIC, n3 NUMERIC) RETURNS TABLE (Customer INTEGER, G_Name VARCHAR, G_Discount VARCHAR)
+CREATE OR REPLACE FUNCTION nnn(n1 NUMERIC, n2 NUMERIC, n3 NUMERIC) RETURNS TABLE (Customer INTEGER, G_Name VARCHAR, G_Discount NUMERIC)
 AS $$
 BEGIN
 RETURN QUERY
@@ -55,7 +57,7 @@ SELECT group_id,  AVG(Group_Margin) AS mar
 FROM groups
 GROUP BY group_id
 )
-SELECT  customer_id ,groups.group_id, groups.group_affinity_index, mar/100.*n1. AS mar
+SELECT  customer_id ,groups.group_id, groups.group_affinity_index, mar/100.*n1 AS mar
 FROM groups
 JOIN tt ON tt.group_id = groups.group_id
 WHERE Group_Churn_Rate <= n2 AND Group_Discount_Share <=n3 ),
@@ -82,5 +84,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-
-SELECT * FROM nnn(10, 3,3)
+SELECT * FROM test('2023-08-20', '2015-01-20', 3, 10, 3,3)
