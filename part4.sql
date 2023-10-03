@@ -44,25 +44,43 @@ $$ LANGUAGE plpgsql;
 
 
 
-WITH
-tmp AS (
-SELECT customer_id, group_id, Group_Affinity_Index, ROW_NUMBER() OVER (PARTITION BY group_id ORDER BY Group_Affinity_Index DESC) AS rank
-FROM groups
-WHERE Group_Churn_Rate <= 1.2 AND Group_Discount_Share <=3)
-SELECT customer_id, group_id, Group_Affinity_Index FROM tmp
-WHERE rank = 1
-
-
-
-CREATE OR REPLACE FUNCTION ttttt(ma NUMERIC, mi NUMERIC, average_factor NUMERIC) RETURNS TABLE (Customer_ID INTEGER, Group_Name VARCHAR, Offer_Discount_Depth VARCHAR)
+CREATE OR REPLACE FUNCTION nnn(n1 NUMERIC, n2 NUMERIC, n3 NUMERIC) RETURNS TABLE (Customer INTEGER, G_Name VARCHAR, G_Discount VARCHAR)
 AS $$
 BEGIN
+RETURN QUERY
 WITH
 tmp AS (
-SELECT  DISTINCT ON (customer_id) customer_id, Group_Margin
+WITH tt AS (
+SELECT group_id,  AVG(Group_Margin) AS mar
 FROM groups
-WHERE Group_Churn_Rate <= 1.2 AND Group_Discount_Share <=3
+GROUP BY group_id
 )
-SELECT * FROM tmp
+SELECT  customer_id ,groups.group_id, groups.group_affinity_index, mar/100.*n1. AS mar
+FROM groups
+JOIN tt ON tt.group_id = groups.group_id
+WHERE Group_Churn_Rate <= n2 AND Group_Discount_Share <=n3 ),
+tmp2 AS (
+WITH tt AS (
+SELECT customer_id,  group_id, MIN(Group_Min_Discount) AS minn
+FROM periods
+GROUP BY customer_id,  group_id
+)
+SELECT customer_id,  group_id, (ROUND(minn*100./5.+0.5)*5)::NUMERIC AS ddd
+FROM tt
+), 
+Res AS (
+select tmp.customer_id,  tmp.group_id, group_affinity_index, mar, ddd,
+row_number() over (partition by tmp.customer_id order by group_affinity_index DESC) as rank
+from tmp
+JOIN tmp2
+ON tmp.customer_id=tmp2.customer_id AND tmp.group_id=tmp2.group_id  AND ddd < mar)
+SELECT customer_id, Skugroup.group_name, ddd AS Offer_Discount_Depth
+FROM Res
+JOIN Skugroup ON Res.group_id=Skugroup.group_id
+WHERE rank = 1;
 END;
-$$ LANGUAGE plpgsql
+$$ LANGUAGE plpgsql;
+
+
+
+SELECT * FROM nnn(10, 3,3)
