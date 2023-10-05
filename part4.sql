@@ -17,7 +17,7 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION OffersGrowthCheck(first_date date, last_date date, average_factor NUMERIC, maximum_churn_index NUMERIC, maximum_share  NUMERIC, margin_share NUMERIC)
+CREATE OR REPLACE FUNCTION OffersGrowthCheck(first_date DATE, last_date DATE, average_factor NUMERIC, maximum_churn_index NUMERIC, maximum_share  NUMERIC, margin_share NUMERIC)
 RETURNS TABLE (Customer_ID INTEGER, Required_Check_Measure NUMERIC, Group_Name VARCHAR, Offer_Discount_Depth NUMERIC)
 AS $$
 BEGIN
@@ -93,8 +93,7 @@ JOIN tmp2
 ON tmp.customer_id=tmp2.customer_id AND tmp.group_id=tmp2.group_id  AND ddd < mar)
 SELECT customer_id, Skugroup.group_name, ddd AS Offer_Discount_Depth
 FROM Res
-JOIN Skugroup ON Res.group_id=Skugroup.group_id
-WHERE rank = 1;
+JOIN Skugroup ON Res.group_id=Skugroup.group_id;
 END;
 $$ LANGUAGE plpgsql;
 
