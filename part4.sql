@@ -17,49 +17,6 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION OffersGrowthCheck(first_date DATE, last_date DATE, average_factor NUMERIC, maximum_churn_index NUMERIC, maximum_share  NUMERIC, margin_share NUMERIC)
-RETURNS TABLE (Customer_ID INTEGER, Required_Check_Measure NUMERIC, Group_Name VARCHAR, Offer_Discount_Depth NUMERIC)
-AS $$
-BEGIN
-IF (last_date > GetDates(1)) THEN
-last_date = GetDates(1);
-ELSEIF (first_date < GetDates(2)) THEN
-first_date = GetDates(2);
-ELSEIF (first_date >= last_date) THEN
-RAISE EXCEPTION
-'Некорректный период';
-END IF;
-RETURN QUERY
-WITH res1 AS (
-WITH 
-SUMM AS (
-SELECT Personalinformation.customer_id AS c_id, SUM(checks.sku_sum_Paid) AS Required
-FROM Personalinformation
-JOIN Cards ON Personalinformation.customer_id = Cards.customer_id
-JOIN Transactions ON Cards.customer_card_id = Transactions.customer_card_id
-JOIN Checks ON Checks.Transaction_id = Transactions.Transaction_id
---WHERE date(transaction_datetime) >= '2015-01-20' AND date(transaction_datetime)<= '2023-08-20'
-WHERE date(transaction_datetime) >= first_date AND date(transaction_datetime)<= last_date
-GROUP BY Personalinformation.customer_id), 
-Counn AS (
-SELECT Cards.Customer_id, COUNT(*) AS cc
-FROM Cards
-JOIN Transactions ON Cards.customer_card_id = Transactions.customer_card_id
---WHERE date(transaction_datetime) >= '2015-01-20' AND date(transaction_datetime)<= '2023-08-20'
-WHERE date(transaction_datetime) >= first_date AND date(transaction_datetime)<= last_date
-GROUP BY Cards.Customer_id
-)
-SELECT c_id, SUMM.Required, Counn.cc AS Req
-FROM SUMM
-JOIN Counn ON Counn.Customer_id= SUMM.c_id)
-SELECT c_id, ROUND(Req,2) , G_Name , G_Discount NUMERIC 
-FROM res1
-JOIN GetGroupNameAndDiscount(maximum_churn_index, maximum_share,margin_share) tmp ON res1.c_id = tmp.Customer;
-END;
-$$ LANGUAGE plpgsql;
-
-
-
 CREATE OR REPLACE FUNCTION GetGroupNameAndDiscount(n1 NUMERIC, n2 NUMERIC, n3 NUMERIC) 
 RETURNS TABLE (Customer INTEGER, G_Name VARCHAR, G_Discount NUMERIC)
 AS $$
@@ -96,6 +53,49 @@ FROM Res
 JOIN Skugroup ON Res.group_id=Skugroup.group_id;
 END;
 $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION OffersGrowthCheck(first_date DATE, last_date DATE, average_factor NUMERIC, maximum_churn_index NUMERIC, maximum_share  NUMERIC, margin_share NUMERIC)
+RETURNS TABLE (Customer_ID INTEGER, Required_Check_Measure NUMERIC, Group_Name VARCHAR, Offer_Discount_Depth NUMERIC)
+AS $$
+BEGIN
+IF (last_date > GetDates(1)) THEN
+last_date = GetDates(1);
+ELSEIF (first_date < GetDates(2)) THEN
+first_date = GetDates(2);
+ELSEIF (first_date >= last_date) THEN
+RAISE EXCEPTION
+'Некорректный период';
+END IF;
+RETURN QUERY
+WITH res1 AS (
+WITH 
+SUMM AS (
+SELECT Personalinformation.customer_id AS c_id, SUM(checks.sku_sum_Paid) AS Required
+FROM Personalinformation
+JOIN Cards ON Personalinformation.customer_id = Cards.customer_id
+JOIN Transactions ON Cards.customer_card_id = Transactions.customer_card_id
+JOIN Checks ON Checks.Transaction_id = Transactions.Transaction_id
+WHERE date(transaction_datetime) >= first_date AND date(transaction_datetime)<= last_date
+GROUP BY Personalinformation.customer_id), 
+Counn AS (
+SELECT Cards.Customer_id, COUNT(*) AS cc
+FROM Cards
+JOIN Transactions ON Cards.customer_card_id = Transactions.customer_card_id
+WHERE date(transaction_datetime) >= first_date AND date(transaction_datetime)<= last_date
+GROUP BY Cards.Customer_id
+)
+SELECT c_id, SUMM.Required, Counn.cc AS Req
+FROM SUMM
+JOIN Counn ON Counn.Customer_id= SUMM.c_id)
+SELECT c_id, ROUND(Req,2) , G_Name , G_Discount NUMERIC 
+FROM res1
+JOIN GetGroupNameAndDiscount(maximum_churn_index, maximum_share,margin_share) tmp ON res1.c_id = tmp.Customer;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
 
 
 SELECT * FROM OffersGrowthCheck('2015-01-20', '2023-08-20', 3, 40 ,3, 3);

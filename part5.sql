@@ -6,7 +6,7 @@ RETURN QUERY
 SELECT  Personalinformation.customer_id  AS c_id, first_date, last_date,  ROUND((last_date-first_date)/Customer_Frequency)+number_of_transactions, 
 GG.G_Name, GG.G_Discount
 FROM Personalinformation
-JOIN GetGroupNameAndDiscount(maximum_churn_index, maximum_share, margin_share  GG ON Personalinformation.customer_id = GG.Customer
+JOIN GetGroupNameAndDiscount(maximum_churn_index, maximum_share, margin_share)  GG ON Personalinformation.customer_id = GG.Customer
 JOIN Customers ON Customers.customer_id = Personalinformation.customer_id;
 END;
 $$ LANGUAGE plpgsql;

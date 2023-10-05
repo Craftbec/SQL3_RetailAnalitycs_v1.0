@@ -89,7 +89,4 @@ $$ LANGUAGE plpgsql;
 
 
 
-
-
-
-SELECT * FROM CrossSelling(2, 100, 100, 1, 40)
+SELECT * FROM CrossSelling(2, 100, 100, 1, 40);
