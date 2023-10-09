@@ -85,6 +85,35 @@ $$ LANGUAGE plpgsql;
 
 
 
+CREATE OR REPLACE FUNCTION OffersGrowthCheck(num_transaction NUMERIC, average_factor NUMERIC, maximum_churn_index NUMERIC, maximum_share  NUMERIC, margin_share NUMERIC)
+RETURNS TABLE (Customer_ID INTEGER, Required_Check_Measure NUMERIC, Group_Name VARCHAR, Offer_Discount_Depth NUMERIC)
+AS $$
+BEGIN
+IF (num_transaction < 0)THEN
+RAISE EXCEPTION
+'Некорректный ввод количества транзакций';
+END IF;
+RETURN QUERY
+WITH test AS (
+SELECT Cards.customer_id,
+	ROW_NUMBER() OVER(PARTITION BY Cards.customer_id ORDER BY Transactions.transaction_datetime DESC) AS counter,
+	SUM(Transactions.transaction_summ) OVER(PARTITION BY Cards.customer_id ORDER BY Transactions.transaction_datetime DESC) AS fullsumm
+FROM Cards
+	JOIN Transactions ON Transactions.customer_card_id = Cards.customer_card_id
+ORDER BY 1, 3 DESC
+),
+res AS (
+SELECT test.customer_id::integer AS c_id,
+round((test.fullsumm / test.counter)::numeric, 2) * average_factor AS target,
+ROW_NUMBER() OVER(PARTITION BY test.customer_id) AS cc
+FROM test
+WHERE test.counter <= num_transaction)
+SELECT c_id, target, g_name, g_discount FROM res
+JOIN GetGroupNameAndDiscount(maximum_churn_index, maximum_share,margin_share) tt ON tt.customer = res.c_id
+WHERE cc =1;
+END;
+$$ LANGUAGE plpgsql;
 
 
-SELECT * FROM OffersGrowthCheck('2015-01-20', '2023-08-20', 3, 40 ,3, 3);
+SELECT * FROM OffersGrowthCheck(100, 1, 40 ,3, 3);
+SELECT * FROM OffersGrowthCheck('2010-01-20', '2023-10-20', 1, 40 ,3, 3);
