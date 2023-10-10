@@ -92,13 +92,34 @@ AS $$
 
 SET DATESTYLE to iso, DMY;  
 
--- Before call change the path to .tsv files 
 
-CALL import('PersonalInformation', '/Users/craftbec/SQL3_RetailAnalitycs_v1.0/datasets/Personal_Data.tsv'); 
-CALL import('Cards', '/Users/craftbec/SQL3_RetailAnalitycs_v1.0/datasets/Cards.tsv'); 
-CALL import('Transactions', '/Users/craftbec/SQL3_RetailAnalitycs_v1.0/datasets/Transactions.tsv'); 
-CALL import('SKUGroup', '/Users/craftbec/SQL3_RetailAnalitycs_v1.0/datasets/Groups_SKU.tsv'); 
-CALL import('ProductGrid', '/Users/craftbec/SQL3_RetailAnalitycs_v1.0/datasets/SKU.tsv'); 
-CALL import('Checks', '/Users/craftbec/SQL3_RetailAnalitycs_v1.0/datasets/Checks.tsv'); 
-CALL import('Stores', '/Users/craftbec/SQL3_RetailAnalitycs_v1.0/datasets/Stores.tsv');   
-CALL import('DateOfAnalysisFormation', '/Users/craftbec/SQL3_RetailAnalitycs_v1.0/datasets/Date_Of_Analysis_Formation.tsv');
+-- //////////////// Tests /////////////////
+-- Before call change the path to .tsv files
+
+CALL import('PersonalInformation', '/Users/craftbec/Desktop/SQL3_RetailAnalitycs_v1.0-1/datasets/Personal_Data_Mini.tsv'); 
+CALL import('Cards', '/Users/craftbec/Desktop/SQL3_RetailAnalitycs_v1.0-1/datasets/Cards_Mini.tsv'); 
+CALL import('Transactions', '/Users/craftbec/Desktop/SQL3_RetailAnalitycs_v1.0-1/datasets/Transactions_Mini.tsv'); 
+CALL import('SKUGroup', '/Users/craftbec/Desktop/SQL3_RetailAnalitycs_v1.0-1/datasets/Groups_SKU_Mini.tsv'); 
+CALL import('ProductGrid', '/Users/craftbec/Desktop/SQL3_RetailAnalitycs_v1.0-1/datasets/SKU_Mini.tsv'); 
+CALL import('Checks', '/Users/craftbec/Desktop/SQL3_RetailAnalitycs_v1.0-1/datasets/Checks_Mini.tsv'); 
+CALL import('Stores', '/Users/craftbec/Desktop/SQL3_RetailAnalitycs_v1.0-1/datasets/Stores_Mini.tsv');   
+CALL import('DateOfAnalysisFormation', '/Users/craftbec/Desktop/SQL3_RetailAnalitycs_v1.0-1/datasets/Date_Of_Analysis_Formation.tsv');
+
+SELECT * FROM PersonalInformation;
+SELECT * FROM Cards;
+SELECT * FROM Transactions;
+SELECT * FROM SKUGroup;
+SELECT * FROM ProductGrid;
+SELECT * FROM Checks;
+SELECT * FROM Stores;
+SELECT * FROM DateOfAnalysisFormation;
+
+CALL export('PersonalInformation', '/Users/craftbec/Desktop/Personal_Data.tsv'); 
+CALL export('PersonalInformation', '/Users/craftbec/Desktop/Personal_Data.csv', ','); 
+CALL export('Cards', '/Users/craftbec/Desktop/Cards.tsv'); 
+CALL export('Transactions', '/Users/craftbec/Desktop/Transactions.tsv'); 
+CALL export('SKUGroup', '/Users/craftbec/Desktop/Groups_SKU.tsv'); 
+CALL export('ProductGrid', '/Users/craftbec/Desktop/SKU.tsv'); 
+CALL export('Checks', '/Users/craftbec/Desktop/Checks.tsv'); 
+CALL export('Stores', '/Users/craftbec/Desktop/Stores.tsv');   
+CALL export('DateOfAnalysisFormation', '/Users/craftbec/Desktop/Date_Of_Analysis_Formation.tsv');

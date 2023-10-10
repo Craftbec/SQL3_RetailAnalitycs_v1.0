@@ -46,8 +46,8 @@ INSERT INTO SkuGroup(group_id, group_name) VALUES (100, 'Стекло');
 SELECT * FROM SkuGroup;
 
 -- Change on your role
+SET ROLE <YourRole>;
 DROP OWNED BY Visitor;
 DROP ROLE IF EXISTS Visitor;
 DROP OWNED BY Administrator;
 DROP ROLE IF EXISTS Administrator;
-SET ROLE <YourRole>

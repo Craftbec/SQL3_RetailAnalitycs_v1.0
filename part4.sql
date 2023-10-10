@@ -1,5 +1,4 @@
-DROP FUNCTION IF EXISTS GetDates(integer);
-CREATE FUNCTION GetDates(key integer)
+CREATE OR REPLACE FUNCTION GetDates(key integer)
 RETURNS SETOF date
 AS $$
 BEGIN
@@ -104,16 +103,22 @@ ORDER BY 1, 3 DESC
 ),
 res AS (
 SELECT test.customer_id::integer AS c_id,
-round((test.fullsumm / test.counter)::numeric, 2) * average_factor AS target,
+(test.fullsumm / test.counter)::numeric * average_factor AS target,
 ROW_NUMBER() OVER(PARTITION BY test.customer_id) AS cc
 FROM test
 WHERE test.counter <= num_transaction)
-SELECT c_id, target, g_name, g_discount FROM res
+SELECT c_id, ROUND(target, 2), g_name, g_discount FROM res
 JOIN GetGroupNameAndDiscount(maximum_churn_index, maximum_share,margin_share) tt ON tt.customer = res.c_id
 WHERE cc =1;
 END;
 $$ LANGUAGE plpgsql;
 
 
-SELECT * FROM OffersGrowthCheck(100, 1, 40 ,3, 3);
-SELECT * FROM OffersGrowthCheck('2010-01-20', '2023-10-20', 1, 40 ,3, 3);
+--  ////////////// Tests ///////////////////
+
+SELECT * FROM OffersGrowthCheck(100, 1.1, 40, 3, 3);
+SELECT * FROM OffersGrowthCheck(10, 1.2, 40, 3, 3);
+SELECT * FROM OffersGrowthCheck(5, 1.3, 40, 3, 3);
+SELECT * FROM OffersGrowthCheck('2010-01-20', '2023-10-20', 1.1, 40, 3, 3);
+SELECT * FROM OffersGrowthCheck('2018-01-20', '2022-01-01', 1.2, 40, 3, 3);
+SELECT * FROM OffersGrowthCheck('2022-01-20', '2021-10-20', 1.3, 40, 3, 3);

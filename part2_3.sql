@@ -33,6 +33,7 @@ GROUP BY First_Last_Group.group_id, First_Last_Group.customer_id, First_Group_Pu
 ORDER BY First_Last_Group.customer_id, First_Last_Group.group_id;
 
 
+--  ////////////// Tests ///////////////////
 
 SELECT * FROM Periods
 WHERE Group_Min_Discount=0;
@@ -41,4 +42,7 @@ WHERE Group_Purchase>5;
 SELECT * FROM Periods
 WHERE Group_ID>2 AND Group_ID<5;
 SELECT * FROM Periods
+ORDER BY 4 DESC;
+SELECT * FROM Periods
+WHERE customer_id = 11
 ORDER BY 4 DESC;

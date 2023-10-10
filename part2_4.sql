@@ -94,6 +94,8 @@ JOIN Min_Discount  ON Min_Discount.group_id = Affinity_Index.group_id AND Min_Di
 JOIN Average_discount_amount  ON Affinity_Index.group_id = Average_discount_amount.group_id AND Affinity_Index.customer_id = Average_discount_amount.customer_id;
 
 
+--  ////////////// Tests ///////////////////
+
 SELECT * FROM Groups
 WHERE Group_Average_Discount>0.9;
 SELECT * FROM Groups
@@ -102,3 +104,5 @@ SELECT * FROM Groups
 WHERE group_margin<0;
 SELECT * FROM Groups
 WHERE group_margin>1000;
+SELECT * FROM Groups
+WHERE customer_id = 11;

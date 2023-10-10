@@ -11,4 +11,10 @@ JOIN Customers ON Customers.customer_id = Personalinformation.customer_id;
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT * FROM OffersAimedFrequencyVisits('2021-08-20', '2023-01-20', 100, 40, 3, 3);
+-- //////////////// Tests /////////////////
+
+SELECT * FROM OffersAimedFrequencyVisits('2021-08-20', '2023-01-20', 100, 40, 3, 3) ORDER BY 1;
+SELECT * FROM OffersAimedFrequencyVisits('2021-08-20', '2023-01-20', 100, 40, 3, 3) ORDER BY 6 DESC;
+SELECT * FROM OffersAimedFrequencyVisits('2021-08-20', '2023-01-20', 100, 40, 3, 3) WHERE customer_id = 11;
+SELECT * FROM OffersAimedFrequencyVisits('2021-08-20', '2023-01-20', 100, 40, 3, 3) WHERE offer_discount_depth BETWEEN 25 AND 50;
+SELECT * FROM OffersAimedFrequencyVisits('2021-08-20', '2023-01-20', 100, 40, 3, 3) WHERE group_name = 'Чипсы' ORDER BY 1;

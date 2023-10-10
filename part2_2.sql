@@ -13,6 +13,7 @@ JOIN Stores  ON ProductGrid.sku_id = Stores.sku_id AND Stores.transaction_store_
 GROUP BY PersonalInformation.customer_id, Transactions.transaction_id, Transactions.transaction_datetime, ProductGrid.group_id;
 
 
+--  ////////////// Tests ///////////////////
 
 SELECT * FROM Purchase_History
 WHERE Group_Cost<1000;
@@ -22,3 +23,5 @@ SELECT * FROM Purchase_History
 ORDER BY 1, 4;
 SELECT * FROM Purchase_History
 WHERE Group_Summ<30;
+SELECT * FROM Purchase_History
+WHERE Customer_id = 11;

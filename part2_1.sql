@@ -5,7 +5,7 @@ CREATE TABLE Segments (
     Frequency_of_purchases VARCHAR NOT NULL,
     Churn_probability VARCHAR NOT NULL
 );
-
+-- Before run change path to the file
 CALL import('Segments', '/Users/craftbec/SQL3_RetailAnalitycs_v1.0/datasets/Segments.tsv'); 
 
 DROP MATERIALIZED VIEW IF EXISTS Customers CASCADE;
@@ -172,7 +172,7 @@ JOIN Primary_Store
 ON Average_Check_Segment.customer_id=Primary_Store.customer_id;
 
 
-
+--  ////////////// Tests ///////////////////
 
 SELECT * FROM customers
 WHERE customer_primary_store = 1;
